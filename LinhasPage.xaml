@@ -1,0 +1,154 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="Vectura71.LinhasPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:local="clr-namespace:Vectura71"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    shell:SystemTray.IsVisible="True"
+    local:TiltEffect.IsTiltEnabled="True">
+
+    <toolkit:TransitionService.NavigationInTransition>
+        <toolkit:NavigationInTransition>
+            <toolkit:NavigationInTransition.Backward>
+                <toolkit:TurnstileTransition Mode="BackwardIn" />
+            </toolkit:NavigationInTransition.Backward>
+            <toolkit:NavigationInTransition.Forward>
+                <toolkit:TurnstileTransition Mode="ForwardIn" />
+            </toolkit:NavigationInTransition.Forward>
+        </toolkit:NavigationInTransition>
+    </toolkit:TransitionService.NavigationInTransition>
+    <toolkit:TransitionService.NavigationOutTransition>
+        <toolkit:NavigationOutTransition>
+            <toolkit:NavigationOutTransition.Backward>
+                <toolkit:TurnstileTransition Mode="BackwardOut" />
+            </toolkit:NavigationOutTransition.Backward>
+            <toolkit:NavigationOutTransition.Forward>
+                <toolkit:TurnstileTransition Mode="ForwardOut" />
+            </toolkit:NavigationOutTransition.Forward>
+        </toolkit:NavigationOutTransition>
+    </toolkit:TransitionService.NavigationOutTransition>
+
+    <shell:SystemTray.ProgressIndicator>
+        <shell:ProgressIndicator x:Name="Progress" />
+    </shell:SystemTray.ProgressIndicator>
+
+    <phone:PhoneApplicationPage.Resources>
+
+        <DataTemplate x:Key="ListItem">
+            <local:TiltableControl Tap="Linha_Tap">
+                <toolkit:ContextMenuService.ContextMenu>
+                    <toolkit:ContextMenu>
+                        <toolkit:MenuItem Header="adicionar aos favoritos" Tap="MenuItem_Tap" />
+                    </toolkit:ContextMenu>
+                </toolkit:ContextMenuService.ContextMenu>
+                <StackPanel Orientation="Horizontal" Margin="4,4">
+                    <Border Margin="0,0,15,0" Width="62" Height="62" Background="{Binding Converter={StaticResource TypeColor}, Path=TIPO}">
+                        <Image Source="Assets/bus.png" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </Border>
+                    <TextBlock Text="{Binding NOME}" FontSize="{StaticResource PhoneFontSizeMediumLarge}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </local:TiltableControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="GroupHeaderN">
+            <local:TiltableControl>
+                <Border Background="Transparent" Padding="5">
+                    <Border Background="Transparent" BorderBrush="{StaticResource PhoneAccentBrush}" BorderThickness="3" Width="62" Height="62" Margin="0,0,18,0" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding Key}" Foreground="{StaticResource PhoneForegroundBrush}" FontSize="48" Padding="6" FontFamily="{StaticResource PhoneFontFamilySemiLight}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </Border>
+                </Border>
+            </local:TiltableControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="GroupHeaderT">
+            <local:TiltableControl>
+                <Border Background="Transparent">
+                    <Border Background="Transparent" BorderBrush="Transparent" BorderThickness="1" Width="400" Height="60" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding Path=Key}" Foreground="{StaticResource PhoneAccentBrush}" FontSize="24" Padding="2" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </Border>
+                </Border>
+            </local:TiltableControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="JumpListN">
+            <local:TiltableControl>
+                <Border Background="{Binding Converter={StaticResource JumpList}, ConverterParameter=Background}" Margin="6" >
+                    <TextBlock Text="{Binding Key}" FontFamily="{StaticResource PhoneFontFamilySemiBold}" FontSize="48" Padding="11,0,0,0" Foreground="{Binding Converter={StaticResource JumpList}, ConverterParameter=Foreground}" VerticalAlignment="Bottom" />
+                </Border>
+            </local:TiltableControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="JumpListT">
+            <local:TiltableControl>
+                <Border Background="{Binding Converter={StaticResource JumpList}, ConverterParameter=TypeListB}" Width="470" Height="70" Margin="6">
+                    <TextBlock Text="{Binding Key}" FontSize="24" Padding="2" VerticalAlignment="Bottom" Foreground="{Binding Converter={StaticResource JumpList}, ConverterParameter=TypeListF}" />
+                </Border>
+            </local:TiltableControl>
+        </DataTemplate>
+
+        <ItemsPanelTemplate x:Key="ItemsPanelN">
+            <toolkit:WrapPanel ItemHeight="111" ItemWidth="111" />
+        </ItemsPanelTemplate>
+
+        <ItemsPanelTemplate x:Key="ItemsPanelT">
+            <toolkit:WrapPanel Orientation="Vertical" Margin="12,12,12,0" />
+        </ItemsPanelTemplate>
+
+    </phone:PhoneApplicationPage.Resources>
+
+    <Grid Background="Transparent">
+
+        <controls:Pivot x:Name="MainPivot" Title="TODOS">
+
+            <controls:PivotItem Header="nome‎">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBox x:Name="SearchBox" Grid.Row="0" Margin="0,-110,0,0" Height="80" Visibility="Collapsed" TextChanged="SearchBox_Changed" />
+
+                    <toolkit:LongListSelector x:Name="NameList" IsFlatList="False" DisplayAllGroups="False" Grid.Row="1"
+                                          ItemsSource="{Binding LinhasKey}"
+                                          ItemTemplate="{StaticResource ListItem}"
+                                          GroupHeaderTemplate="{StaticResource GroupHeaderN}"
+                                          GroupItemTemplate="{StaticResource JumpListN}"
+                                          GroupItemsPanel="{StaticResource ItemsPanelN}" />
+                </Grid>
+            </controls:PivotItem>
+
+            <controls:PivotItem Header="tipo">
+                <toolkit:LongListSelector x:Name="TypeList" IsFlatList="False" DisplayAllGroups="False"
+                                          ItemsSource="{Binding LinhasType}"
+                                          ItemTemplate="{StaticResource ListItem}"
+                                          GroupHeaderTemplate="{StaticResource GroupHeaderT}"
+                                          GroupItemTemplate="{StaticResource JumpListT}"
+                                          GroupItemsPanel="{StaticResource ItemsPanelT}" />
+            </controls:PivotItem>
+
+            <controls:Pivot.HeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Margin="0,-10,0,-20" />
+                </DataTemplate>
+            </controls:Pivot.HeaderTemplate>
+
+        </controls:Pivot>
+
+    </Grid>
+
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsMenuEnabled="False">
+            <shell:ApplicationBarIconButton IconUri="/Assets/AppBar/add.png" Text="favorito" Click="AppBar_Add" />
+            <shell:ApplicationBarIconButton IconUri="/Assets/AppBar/search.png" Text="pesquisar" Click="AppBar_Search" />
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+
+</phone:PhoneApplicationPage>
